@@ -1,3 +1,3 @@
-let NameToPrint = "Jade";
-let Greeting = "Hello, " + NameToPrint + "!";
-print (Greeting);
+let nameToPrint = "Jade";
+let Greeting = "Hello, " + nameToPrint + "!";
+print(Greeting);

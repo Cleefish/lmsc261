@@ -1,3 +1,3 @@
-let NameToPrint = prompt ("What's your name?");
-let Greeting = "Hello, " + NameToPrint + "!";
-print (Greeting);
+let nameToPrint = prompt ("What's your name?");
+let Greeting = "Hello, " + nameToPrint + "!";
+print(Greeting);
