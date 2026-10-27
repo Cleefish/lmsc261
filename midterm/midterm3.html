@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<body>
+    <canvas width="650" height="650" id="canvas" style="width: 600px; height: 600px;"></canvas>
+</body>
+
+<script>
+
+    const canvas = document.getElementById ("canvas");
+    const ctx = canvas.getContext ("2d");
+    const w = canvas.width, h = canvas.height;
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width *= dpr, canvas.height *= dpr;
+    ctx.scale (dpr, dpr);
+
+    // BACKGROUND COLOR
+    ctx.fillStyle = "#0B1F3B";
+    ctx.fillRect (0, 0, w, h);
+
+    // GRID SETTINGS
+    const gridSize = 10;
+    const gridGap = 3;
+    const gridDistance = gridSize + gridGap;
+
+    // GRID COLORS
+    const dimColor = "#123A63";
+    const litColor = "#FFF1C1";
+
+    // PAGE SETTINGS
+    let page = 1;
+
+    // LETTER AND NUMBER PATTERNS
+
+        // PAGE ONE
+        const E = [1,1,1,1,1, 1,0,0,0,0, 1,1,1,1,0, 1,0,0,0,0, 1,1,1,1,1];
+        const A = [0,1,1,1,0, 1,0,0,0,1, 1,1,1,1,1, 1,0,0,0,1, 1,0,0,0,1];
+        const S = [0,1,1,1,1, 1,0,0,0,0, 1,1,1,1,1, 0,0,0,0,1, 1,1,1,1,0];
+        const T = [1,1,1,1,1, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0];
+        const M = [1,0,0,0,1, 1,1,0,1,1, 1,0,1,0,1, 1,0,0,0,1, 1,0,0,0,1];
+        const N = [1,0,0,0,1, 1,1,0,0,1, 1,0,1,0,1, 1,0,0,1,1, 1,0,0,0,1];
+        const W = [1,0,0,0,1, 1,0,0,0,1, 1,0,1,0,1, 1,1,0,1,1, 1,0,0,0,1];
+        const J = [0,0,1,1,1, 0,0,0,0,1, 0,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0];
+        const Z = [1,1,1,1,1, 0,0,0,1,0, 0,0,1,0,0, 0,1,0,0,0, 1,1,1,1,1];
+        const O = [0,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0];
+        const R = [1,1,1,1,0, 1,0,0,0,1, 1,1,1,1,0, 1,0,0,1,0, 1,0,0,0,1];
+        const C = [0,1,1,1,1, 1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0, 0,1,1,1,1];
+        const H = [1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,1, 1,0,0,0,1, 1,0,0,0,1];
+
+        // PAGE TWO
+        const B = [1,1,1,1,0, 1,0,0,0,1, 1,1,1,1,0, 1,0,0,0,1, 1,1,1,1,0];
+        const L = [1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0, 1,1,1,1,1];
+        const D = [1,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,0];
+
+        // PAGE THREE
+        const K = [1,0,0,0,1, 1,0,0,1,0, 1,1,1,0,0, 1,0,0,1,0, 1,0,0,0,1];
+        const I = [1,1,1,1,1, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 1,1,1,1,1];
+        const U = [1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0];
+        const P = [1,1,1,1,0, 1,0,0,0,1, 1,1,1,1,0, 1,0,0,0,0, 1,0,0,0,0];
+
+        // NUMBERS
+        const TWO = [0,1,1,1,0, 1,0,0,0,1, 0,0,1,1,0, 0,1,0,0,0, 1,1,1,1,1];
+        const ZERO = [0,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0];
+        const SEVEN = [1,1,1,1,1, 0,0,0,0,1, 0,0,0,1,0, 0,0,1,0,0, 0,0,1,0,0];
+        const THREE = [1,1,1,1,0, 0,0,0,0,1, 0,1,1,1,0, 0,0,0,0,1, 1,1,1,1,0];
+    
+    // DRAW ONE LETTER
+    function drawLetter (letter, x, y) {
+
+        // GO THROUGH FIVE ROWS
+        for (let row = 0; row < 5; row++) {
+
+            // GO THROUGH FIVE COLUMNS
+            for (let column = 0; column < 5; column++) {
+
+                const index = row * 5 + column;
+
+                // LIT OR DIM COLOR
+                if (letter[index] == 1) {
+                    ctx.fillStyle = litColor;
+                    ctx.shadowColor = litColor;
+                    ctx.shadowBlur = 12;
+                } else {
+                    ctx.fillStyle = dimColor;
+                    ctx.shadowBlur = 0;
+                }
+                
+                // DRAW GRIDS
+                ctx.fillRect (
+                    x + column * gridDistance,
+                    y + row * gridDistance,
+                    gridSize,
+                    gridSize
+                );
+            };
+        };
+    }; // END OF DRAW ONE LETTER
+
+    // LETTER SPACING
+    const letterStep = 68;
+
+    // DRAW PAGE ONE
+    function drawPage1 () {
+
+        // LINE #1: EASTMAN
+        drawLetter (E, 20, 150);
+        drawLetter (A, 20 + letterStep, 150);
+        drawLetter (S, 20 + letterStep * 2, 150);
+        drawLetter (T, 20 + letterStep * 3, 150);
+        drawLetter (M, 20 + letterStep * 4, 150);
+        drawLetter (A, 20 + letterStep * 5, 150);
+        drawLetter (N, 20 + letterStep * 6, 150);
+
+        // LINE #2: NEW JAZZ
+        drawLetter (N, 20, 230);
+        drawLetter (E, 20 + letterStep, 230);
+        drawLetter (W, 20 + letterStep * 2, 230);
+
+        drawLetter (J, 20 + letterStep * 4, 230);
+        drawLetter (A, 20 + letterStep * 5, 230);
+        drawLetter (Z, 20 + letterStep * 6, 230);
+        drawLetter (Z, 20 + letterStep * 7, 230);
+
+        // LINE #3: ORCHESTRA
+        drawLetter (O, 20, 310);
+        drawLetter (R, 20 + letterStep, 310);
+        drawLetter (C, 20 + letterStep * 2, 310);
+        drawLetter (H, 20 + letterStep * 3, 310);
+        drawLetter (E, 20 + letterStep * 4, 310);
+        drawLetter (S, 20 + letterStep * 5, 310);
+        drawLetter (T, 20 + letterStep * 6, 310);
+        drawLetter (R, 20 + letterStep * 7, 310);
+        drawLetter (A, 20 + letterStep * 8, 310);
+
+    }; // END OF DRAW PAGE ONE
+
+    // DRAW PAGE TWO
+    function drawPage2 () {
+
+       // LINE #1: BETWEEN
+        drawLetter (B, 20, 150);
+        drawLetter (E, 20 + letterStep, 150);
+        drawLetter (T, 20 + letterStep * 2, 150);
+        drawLetter (W, 20 + letterStep * 3, 150);
+        drawLetter (E, 20 + letterStep * 4, 150);
+        drawLetter (E, 20 + letterStep * 5, 150);
+        drawLetter (N, 20 + letterStep * 6, 150);
+
+        // LINE #2: SNOW AND
+        drawLetter (S, 20, 230);
+        drawLetter (N, 20 + letterStep, 230);
+        drawLetter (O, 20 + letterStep * 2, 230);
+        drawLetter (W, 20 + letterStep * 3, 230);
+
+        drawLetter (A, 20 + letterStep * 5, 230);
+        drawLetter (N, 20 + letterStep * 6, 230);
+        drawLetter (D, 20 + letterStep * 7, 230);
+
+        // LINE #3: SALTWATER
+        drawLetter (S, 20, 310);
+        drawLetter (A, 20 + letterStep, 310);
+        drawLetter (L, 20 + letterStep * 2, 310);
+        drawLetter (T, 20 + letterStep * 3, 310);
+        drawLetter (W, 20 + letterStep * 4, 310);
+        drawLetter (A, 20 + letterStep * 5, 310);
+        drawLetter (T, 20 + letterStep * 6, 310);
+        drawLetter (E, 20 + letterStep * 7, 310);
+        drawLetter (R, 20 + letterStep * 8, 310);
+
+    }; // END OF DRAW PAGE TWO
+
+    // DRAW PAGE THREE
+    function drawPage3 () {
+
+        // LINE #1: OCT 12
+        drawLetter (O, 20, 150);
+        drawLetter (C, 20 + letterStep, 150);
+        drawLetter (T, 20 + letterStep * 2, 150);
+
+        drawLetter (TWO, 20 + letterStep * 4, 150);
+        drawLetter (ZERO, 20 + letterStep * 5, 150);
+
+        // LINE #2: 7:30 PM
+        drawLetter (SEVEN, 20, 230);
+        drawLetter (THREE, 20 + letterStep * 2, 230);
+        drawLetter (ZERO, 20 + letterStep * 3, 230);
+
+        drawLetter (P, 20 + letterStep * 5, 230);
+        drawLetter (M, 20 + letterStep * 6, 230);
+
+            // THE COLON
+            ctx.fillStyle = litColor;
+            ctx.fillRect (20 + letterStep + 26, 243, 10, 10);
+            ctx.fillRect (20 + letterStep + 26, 269, 10, 10);
+
+        // LINE #3: KILBOURN
+        drawLetter (K, 20, 310);
+        drawLetter (I, 20 + letterStep, 310);
+        drawLetter (L, 20 + letterStep * 2, 310);
+        drawLetter (B, 20 + letterStep * 3, 310);
+        drawLetter (O, 20 + letterStep * 4, 310);
+        drawLetter (U, 20 + letterStep * 5, 310);
+        drawLetter (R, 20 + letterStep * 6, 310);
+        drawLetter (N, 20 + letterStep * 7, 310);
+
+        // LINE 4: HALL
+        drawLetter (H, 20, 390);
+        drawLetter (A, 20 + letterStep, 390);
+        drawLetter (L, 20 + letterStep * 2, 390);
+        drawLetter (L, 20 + letterStep * 3, 390);
+
+    }; // END OF DRAW PAGE THREE
+
+    // INITIAL DISPLAY OF PAGE ONE
+    drawPage1 ();
+    
+    // CLICK TO CHANGE PAGE
+    canvas.addEventListener("click", function() {
+
+        // RESET THE CANVAS
+        ctx.fillStyle = "#0B1F3B";
+        ctx.fillRect(0, 0, w, h);
+
+        // CHANGE PAGES
+        if (page == 1) {
+            page = 2;
+            drawPage2 ();
+        } else if (page == 2) {
+            page = 3;
+            drawPage3 ();
+        } else {
+            page =1;
+            drawPage1 ();
+        };
+        
+    });
+
+</script>
